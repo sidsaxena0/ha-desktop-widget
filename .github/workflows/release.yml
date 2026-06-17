@@ -45,30 +45,24 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # Builds are UNSIGNED (Tauri ad-hoc signs the macOS app). To enable a
-      # notarized macOS build later: add a Developer ID cert + the APPLE_*
-      # values as repo secrets, expose them at the JOB level via `env:` (the
-      # `secrets` context can't be used in a step `if:`), and pass them to this
-      # step. See CONTRIBUTING for the full secret list.
+      # Build only (UNSIGNED — Tauri ad-hoc signs the macOS app). We deliberately
+      # do NOT create the GitHub Release here: the default Actions token can't
+      # reliably create releases on this repo, and we won't store a broad PAT in
+      # CI. Instead the installers are uploaded as artifacts and the Release is
+      # published with `gh` (see scripts/publish-release.sh).
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: "HA Widget ${{ github.ref_name }}"
-          releaseDraft: true
-          prerelease: false
           args: ${{ matrix.args }}
-          releaseBody: |
-            Always-on-top desktop widget for controlling Home Assistant.
 
-            ### Download
-            - **macOS** — `.dmg` (universal: Apple Silicon + Intel)
-            - **Windows** — `.msi` or `-setup.exe` installer
-
-            ### First launch (these builds are unsigned)
-            - **macOS:** right-click the app → **Open** → **Open**, or run
-              `xattr -dr com.apple.quarantine "/Applications/HA Widget.app"`.
-            - **Windows:** if SmartScreen appears, click **More info → Run anyway**.
-
-            See the [README](https://github.com/sidsaxena0/ha-desktop-widget#readme) for setup.
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: installers-${{ matrix.platform }}
+          if-no-files-found: ignore
+          retention-days: 14
+          path: |
+            src-tauri/target/**/release/bundle/dmg/*.dmg
+            src-tauri/target/**/release/bundle/msi/*.msi
+            src-tauri/target/**/release/bundle/nsis/*-setup.exe
