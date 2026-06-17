@@ -203,7 +203,10 @@ fn localness(base_url: &str) -> i32 {
     if host == "localhost" || host.ends_with(".local") {
         return 3;
     }
-    let octets: Vec<u8> = host.split('.').filter_map(|o| o.parse::<u8>().ok()).collect();
+    let octets: Vec<u8> = host
+        .split('.')
+        .filter_map(|o| o.parse::<u8>().ok())
+        .collect();
     if octets.len() == 4 {
         let (a, b) = (octets[0], octets[1]);
         if a == 127
@@ -227,7 +230,10 @@ fn url_host(base_url: &str) -> String {
     let s = base_url.trim();
     let after = s.split_once("://").map(|(_, r)| r).unwrap_or(s);
     let host_port = after.split(['/', '?', '#']).next().unwrap_or(after);
-    let host = host_port.rsplit_once(':').map(|(h, _)| h).unwrap_or(host_port);
+    let host = host_port
+        .rsplit_once(':')
+        .map(|(h, _)| h)
+        .unwrap_or(host_port);
     host.trim_matches(|c| c == '[' || c == ']').to_string()
 }
 
