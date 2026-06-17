@@ -111,10 +111,23 @@ Artifacts land in `src-tauri/target/**/release/bundle/`:
 
 ### Releasing both platforms via CI
 
-Pushing a tag like `v0.1.0` triggers
-[`.github/workflows/release.yml`](.github/workflows/release.yml), which builds a
-**macOS universal** bundle and **Windows** installers and attaches them to a
-draft GitHub Release.
+Releases are a two-step flow (CI builds; you publish — so no broad token is ever
+stored in the repo):
+
+1. Push a version tag:
+   ```bash
+   git tag -a v0.1.0 -m v0.1.0 && git push origin v0.1.0
+   ```
+   [`.github/workflows/release.yml`](.github/workflows/release.yml) builds the
+   **macOS universal** bundle and **Windows** installers and uploads them as
+   workflow artifacts.
+2. After the run finishes, publish the GitHub Release from your authenticated
+   `gh` session:
+   ```bash
+   scripts/publish-release.sh v0.1.0
+   ```
+   This downloads the artifacts and creates the Release with the `.dmg`, `.msi`,
+   and `.exe` attached.
 
 ## Signing & Gatekeeper / SmartScreen
 
