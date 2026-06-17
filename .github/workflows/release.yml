@@ -43,21 +43,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # macOS code-signing + notarization runs ONLY when the Developer ID
-      # secrets exist; otherwise the build stays unsigned (Tauri ad-hoc signs
-      # it). This keeps the workflow green with or without secrets configured.
-      - name: Configure Apple signing
-        if: ${{ matrix.platform == 'macos-latest' && secrets.APPLE_CERTIFICATE != '' }}
-        run: |
-          {
-            echo "APPLE_CERTIFICATE=${{ secrets.APPLE_CERTIFICATE }}"
-            echo "APPLE_CERTIFICATE_PASSWORD=${{ secrets.APPLE_CERTIFICATE_PASSWORD }}"
-            echo "APPLE_SIGNING_IDENTITY=${{ secrets.APPLE_SIGNING_IDENTITY }}"
-            echo "APPLE_ID=${{ secrets.APPLE_ID }}"
-            echo "APPLE_PASSWORD=${{ secrets.APPLE_PASSWORD }}"
-            echo "APPLE_TEAM_ID=${{ secrets.APPLE_TEAM_ID }}"
-          } >> "$GITHUB_ENV"
-
+      # Builds are UNSIGNED (Tauri ad-hoc signs the macOS app). To enable a
+      # notarized macOS build later: add a Developer ID cert + the APPLE_*
+      # values as repo secrets, expose them at the JOB level via `env:` (the
+      # `secrets` context can't be used in a step `if:`), and pass them to this
+      # step. See CONTRIBUTING for the full secret list.
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
