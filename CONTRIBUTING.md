@@ -33,16 +33,27 @@ pnpm app:dev
 
 During development, each rebuild changes the binary's signature, which breaks
 Keychain ACLs — so macOS re-prompts *"… wants to use your keychain"* on every
-run. Stabilize the identity by **ad-hoc signing** the dev build:
+run, and ad-hoc signatures (`codesign -s -`) change every build so "Always
+Allow" never sticks.
+
+The durable fix is to sign with a **stable identity**. If you have an Apple
+**Apple Development** (or Developer ID) certificate, sign the built app once —
+its designated requirement is stable, so a single **Always Allow** persists
+across launches and rebuilds:
 
 ```bash
-# after a build, before running (or wire into your own dev loop):
-codesign --force --sign - "src-tauri/target/debug/ha-desktop-widget"
+# list available identities:
+security find-identity -v -p codesigning
+# sign the built app (use your identity's name):
+codesign --force --deep --sign "Apple Development: Your Name (TEAMID)" \
+  "/Applications/HA Widget.app"
 ```
 
-The first keychain prompt after an ad-hoc sign can be answered **Always Allow**
-and will then stick across rebuilds. This is a dev-only nuisance — release
-builds are properly signed + notarized, so it does not affect end users.
+Tauri can also sign at build time via `APPLE_SIGNING_IDENTITY="Apple Development:
+…" pnpm tauri build` — don't hard-code a personal identity in `tauri.conf.json`.
+No notarization is needed for local use; release builds are notarized in CI.
+Also note: the app reads each profile's token from the keychain only **once per
+session** (cached in memory), so wake-from-sleep never re-prompts.
 
 ## Icons (vendored MDI, woff2-only)
 
