@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Outbound network access to reach the Home Assistant instance. -->
+  <key>com.apple.security.network.client</key>
+  <true/>
+  <!--
+    Hardened runtime is required for notarization. We deliberately do NOT set
+    a keychain-access-groups entitlement: the app uses the default keychain
+    item access for its own bundle identifier, which is what `keyring` needs.
+  -->
+</dict>
+</plist>

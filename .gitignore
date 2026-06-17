@@ -1,0 +1,30 @@
+# Node / frontend
+node_modules/
+dist/
+dist-ssr/
+*.local
+.DS_Store
+
+# Vite
+.vite/
+
+# Rust / Tauri
+src-tauri/target/
+src-tauri/gen/
+
+# Signing / secrets — never commit these
+*.p12
+*.cer
+*.certSigningRequest
+*.provisionprofile
+.env
+.env.*
+!.env.example
+
+# Editor
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Local agent / tooling config
+.claude/

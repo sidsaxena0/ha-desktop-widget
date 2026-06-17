@@ -1,0 +1,48 @@
+[package]
+name = "ha-desktop-widget"
+version = "0.1.0"
+description = "Lightweight always-on-top desktop widget for controlling Home Assistant."
+authors = ["ha-desktop-widget contributors"]
+license = "MIT"
+edition = "2021"
+rust-version = "1.77"
+
+# The library is what Tauri's mobile/desktop entrypoints call into.
+[lib]
+name = "ha_widget_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-autostart = "2"
+tauri-plugin-window-state = "2"
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Async runtime + Home Assistant WebSocket / HTTP clients.
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "net"] }
+tokio-tungstenite = { version = "0.24", features = ["rustls-tls-native-roots"] }
+futures-util = "0.3"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+
+# Token storage via OS-native secure stores (Keychain / Credential Manager).
+keyring = { version = "3", features = ["apple-native", "windows-native"] }
+
+uuid = { version = "1", features = ["v4"] }
+thiserror = "2"
+log = "0.4"
+
+[features]
+# This feature is used for production builds where `devUrl` is disabled.
+custom-protocol = ["tauri/custom-protocol"]
+
+[profile.release]
+opt-level = "s"   # optimise for small binary size
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
