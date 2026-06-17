@@ -62,3 +62,16 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
+          releaseBody: |
+            Always-on-top desktop widget for controlling Home Assistant.
+
+            ### Download
+            - **macOS** — `.dmg` (universal: Apple Silicon + Intel)
+            - **Windows** — `.msi` or `-setup.exe` installer
+
+            ### First launch (these builds are unsigned)
+            - **macOS:** right-click the app → **Open** → **Open**, or run
+              `xattr -dr com.apple.quarantine "/Applications/HA Widget.app"`.
+            - **Windows:** if SmartScreen appears, click **More info → Run anyway**.
+
+            See the [README](https://github.com/sidsaxena0/ha-desktop-widget#readme) for setup.
